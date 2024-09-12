@@ -14,6 +14,7 @@ import javax.swing.JButton;
 import java.awt.SystemColor;
 import javax.swing.ImageIcon;
 import java.awt.Cursor;
+import javax.swing.DefaultComboBoxModel;
 
 public class Cep extends JFrame {
 
@@ -97,6 +98,7 @@ public class Cep extends JFrame {
 		contentPane.add(lblNewLabel_4);
 		
 		JComboBox cmb_uf = new JComboBox();
+		cmb_uf.setModel(new DefaultComboBoxModel(new String[] {"", "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"}));
 		cmb_uf.setBounds(347, 154, 55, 22);
 		contentPane.add(cmb_uf);
 		
