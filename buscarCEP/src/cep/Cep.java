@@ -1,20 +1,21 @@
 package cep;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JLabel;
-import java.awt.Toolkit;
-import javax.swing.JTextField;
-import javax.swing.JComboBox;
-import javax.swing.JButton;
-import java.awt.SystemColor;
-import javax.swing.ImageIcon;
 import java.awt.Cursor;
+import java.awt.EventQueue;
+import java.awt.SystemColor;
+import java.awt.Toolkit;
+
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
+
+import Atxy2k.CustomTextField.RestrictedTextField;
 
 public class Cep extends JFrame {
 
@@ -118,5 +119,11 @@ public class Cep extends JFrame {
 		btn_sobre.setBackground(SystemColor.control);
 		btn_sobre.setBounds(371, 11, 32, 32);
 		contentPane.add(btn_sobre);
-	}
+		
+		/* Uso da biblioteca Atxy2k.jar para validação do campo txt_cep*/
+		RestrictedTextField validar = new RestrictedTextField(txt_cep);
+		validar.setOnlyNums(true);
+		validar.setLimit(8);		
+		
+	} // Fim do construtor
 }
