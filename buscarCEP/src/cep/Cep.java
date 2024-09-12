@@ -10,10 +10,10 @@ import javax.swing.JLabel;
 import java.awt.Toolkit;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import java.awt.SystemColor;
 import javax.swing.ImageIcon;
+import java.awt.Cursor;
 
 public class Cep extends JFrame {
 
@@ -109,10 +109,12 @@ public class Cep extends JFrame {
 		contentPane.add(btn_limpar);
 		
 		JButton btn_sobre = new JButton("");
+		btn_sobre.setToolTipText("Sobre");
+		btn_sobre.setBorder(null);
+		btn_sobre.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btn_sobre.setIcon(new ImageIcon(Cep.class.getResource("/img/information-button.png")));
 		btn_sobre.setBackground(SystemColor.control);
 		btn_sobre.setBounds(371, 11, 32, 32);
-		btn_sobre.setBorder(BorderFactory.createEmptyBorder());;
 		contentPane.add(btn_sobre);
 	}
 }
