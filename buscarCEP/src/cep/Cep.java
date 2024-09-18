@@ -6,6 +6,7 @@ import java.awt.SystemColor;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.URI;
 import java.net.URL;
 import java.util.Iterator;
 
@@ -35,6 +36,7 @@ public class Cep extends JFrame {
 	private JTextField txt_bairro;
 	private JTextField txt_cidade;
 	private JComboBox cmb_uf;
+	private JLabel lbl_status;
 
 	/**
 	 * Launch the application.
@@ -73,16 +75,16 @@ public class Cep extends JFrame {
 		contentPane.add(lblNewLabel);
 
 		txt_cep = new JTextField();
-		txt_cep.setBounds(72, 22, 145, 20);
+		txt_cep.setBounds(82, 22, 139, 20);
 		contentPane.add(txt_cep);
 		txt_cep.setColumns(10);
 
 		JLabel lblNewLabel_1 = new JLabel("Endereço");
-		lblNewLabel_1.setBounds(20, 71, 46, 14);
+		lblNewLabel_1.setBounds(20, 71, 55, 14);
 		contentPane.add(lblNewLabel_1);
 
 		txt_endereco = new JTextField();
-		txt_endereco.setBounds(72, 68, 330, 20);
+		txt_endereco.setBounds(82, 68, 320, 20);
 		contentPane.add(txt_endereco);
 		txt_endereco.setColumns(10);
 
@@ -91,7 +93,7 @@ public class Cep extends JFrame {
 		contentPane.add(lblNewLabel_2);
 
 		txt_bairro = new JTextField();
-		txt_bairro.setBounds(72, 113, 330, 20);
+		txt_bairro.setBounds(82, 113, 320, 20);
 		contentPane.add(txt_bairro);
 		txt_bairro.setColumns(10);
 
@@ -100,7 +102,7 @@ public class Cep extends JFrame {
 		contentPane.add(lblNewLabel_3);
 
 		txt_cidade = new JTextField();
-		txt_cidade.setBounds(72, 155, 220, 20);
+		txt_cidade.setBounds(82, 155, 210, 20);
 		contentPane.add(txt_cidade);
 		txt_cidade.setColumns(10);
 
@@ -133,10 +135,18 @@ public class Cep extends JFrame {
 
 			}
 		});
-		btn_buscar.setBounds(248, 21, 89, 23);
+		btn_buscar.setBounds(260, 21, 89, 23);
 		contentPane.add(btn_buscar);
 
 		JButton btn_limpar = new JButton("Limpar");
+		btn_limpar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			
+				/*Chamando o método limpar*/
+				limpar();
+				
+			}
+		});
 		btn_limpar.setBounds(20, 202, 89, 23);
 		contentPane.add(btn_limpar);
 
@@ -158,6 +168,10 @@ public class Cep extends JFrame {
 
 		/* Uso da biblioteca Atxy2k.jar para validação do campo txt_cep */
 		RestrictedTextField validar = new RestrictedTextField(txt_cep);
+		
+		lbl_status = new JLabel("");
+		lbl_status.setBounds(230, 22, 20, 20);
+		contentPane.add(lbl_status);
 		validar.setOnlyNums(true);
 		validar.setLimit(8);
 
@@ -174,7 +188,9 @@ public class Cep extends JFrame {
 		try {
 			
 			/*Classe modelo utilizada para ler um conteúdo na web*/
-			URL url = new URL("http://cep.republicavirtual.com.br/web_cep.php?cep=" + cep + "&formato=xml");
+		    URI uri = new URI("http://cep.republicavirtual.com.br/web_cep.php?cep=" + cep + "&formato=xml");
+		    URL url = uri.toURL();
+		    
 			SAXReader xml = new SAXReader();
 			Document documento = xml.read(url);
 			Element root = documento.getRootElement();	
@@ -209,11 +225,14 @@ public class Cep extends JFrame {
 				}
 				
 				/* Variavel de apoio para buscar o resultado da API*/
-				if(element.getQualifiedName().equals(resultado)) {
+				if(element.getQualifiedName().equals("resultado")) {
 					resultado = element.getText();
-					
+										
 					/* validando se o CEP é um número válido*/
 					if(resultado.equals("1")) {
+						
+						/* setando a imagem de check quando um cep válido*/
+						lbl_status.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/check.png")));
 						
 					}else {
 						JOptionPane.showMessageDialog(null, "CEP não encontrado");
@@ -231,4 +250,18 @@ public class Cep extends JFrame {
 		}
 
 	}
+	
+	/* Classe responsável por conter o código que limpa as informações no formulário*/
+	private void limpar() {
+		
+		/* utilizando o setText para limpar os valores dos campos já preenchidos*/
+		txt_cep.setText(null);
+		txt_endereco.setText(null);
+		txt_bairro.setText(null);
+		txt_cidade.setText(null);
+		cmb_uf.setSelectedItem(null);
+		txt_cep.requestFocus();
+		lbl_status.setIcon(null);
+	}
+	
 }
