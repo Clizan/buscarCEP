@@ -8,6 +8,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URI;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.util.Iterator;
 
 import javax.swing.DefaultComboBoxModel;
@@ -26,6 +28,7 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
 import Atxy2k.CustomTextField.RestrictedTextField;
+import controller.dao;
 
 public class Cep extends JFrame {
 
@@ -141,10 +144,10 @@ public class Cep extends JFrame {
 		JButton btn_limpar = new JButton("Limpar");
 		btn_limpar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-			
-				/*Chamando o método limpar*/
+
+				/* Chamando o método limpar */
 				limpar();
-				
+
 			}
 		});
 		btn_limpar.setBounds(20, 202, 89, 23);
@@ -153,7 +156,7 @@ public class Cep extends JFrame {
 		JButton btn_sobre = new JButton("");
 		btn_sobre.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+
 				Sobre sobre = new Sobre();
 				sobre.setVisible(true);
 			}
@@ -168,7 +171,7 @@ public class Cep extends JFrame {
 
 		/* Uso da biblioteca Atxy2k.jar para validação do campo txt_cep */
 		RestrictedTextField validar = new RestrictedTextField(txt_cep);
-		
+
 		lbl_status = new JLabel("");
 		lbl_status.setBounds(230, 22, 20, 20);
 		contentPane.add(lbl_status);
@@ -184,77 +187,82 @@ public class Cep extends JFrame {
 		String tipoLogradouro = "";
 		String resultado = null;
 		String cep = txt_cep.getText();
-		
+
 		try {
-			
-			/*Classe modelo utilizada para ler um conteúdo na web*/
-		    URI uri = new URI("http://cep.republicavirtual.com.br/web_cep.php?cep=" + cep + "&formato=xml");
-		    URL url = uri.toURL();
-		    
+
+			/* Classe modelo utilizada para ler um conteúdo na web */
+			URI uri = new URI("http://cep.republicavirtual.com.br/web_cep.php?cep=" + cep + "&formato=xml");
+			URL url = uri.toURL();
+
 			SAXReader xml = new SAXReader();
 			Document documento = xml.read(url);
-			Element root = documento.getRootElement();	
-			
-			for(Iterator<Element> it = root.elementIterator(); it.hasNext();) {
+			Element root = documento.getRootElement();
+
+			for (Iterator<Element> it = root.elementIterator(); it.hasNext();) {
 				Element element = it.next();
-				
-				/* validando se o elemento bairro foi encontrado*/
-				if(element.getQualifiedName().equals("bairro")) {
+
+				/* validando se o elemento bairro foi encontrado */
+				if (element.getQualifiedName().equals("bairro")) {
 					txt_bairro.setText(element.getText());
 				}
-				
+
 				/* Validando se o elemento cidade foi encontrada */
-				if(element.getQualifiedName().equals("cidade")) {
-					/*Setando o valor encontrado após a busca da API*/
+				if (element.getQualifiedName().equals("cidade")) {
+					/* Setando o valor encontrado após a busca da API */
 					txt_cidade.setText(element.getText());
 				}
-				
-				/* Validando se o elemento uf foi encontrado*/
-				if(element.getQualifiedName().equals("uf")) {
+
+				/* Validando se o elemento uf foi encontrado */
+				if (element.getQualifiedName().equals("uf")) {
 					cmb_uf.setSelectedItem(element.getText());
 				}
-				
+
 				/* Validando se o elemento endereço foi encontrado */
-				if(element.getQualifiedName().equals("tipo_logradouro")) {
+				if (element.getQualifiedName().equals("tipo_logradouro")) {
 					tipoLogradouro = element.getText();
 				}
-				
+
 				/* Validando se o elemento endereço foi encontrado */
-				if(element.getQualifiedName().equals("logradouro")) {
+				if (element.getQualifiedName().equals("logradouro")) {
 					logradouro = element.getText();
 				}
-				
-				/* Variavel de apoio para buscar o resultado da API*/
-				if(element.getQualifiedName().equals("resultado")) {
+
+				/* Variavel de apoio para buscar o resultado da API */
+				if (element.getQualifiedName().equals("resultado")) {
 					resultado = element.getText();
-										
-					/* validando se o CEP é um número válido*/
-					if(resultado.equals("1")) {
-						
-						/* setando a imagem de check quando um cep válido*/
+
+					/* validando se o CEP é um número válido */
+					if (resultado.equals("1")) {
+
+						/* setando a imagem de check quando um cep válido */
 						lbl_status.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/check.png")));
-						
-					}else {
+
+					} else {
 						JOptionPane.showMessageDialog(null, "CEP não encontrado");
 					}
 				}
 			}
-			
+
 			// setar o campo endereço
 			txt_endereco.setText(tipoLogradouro + " " + logradouro);
-			
+
+			// Chamar o método para salvar log
+			salvarLog(txt_cep.getText(), txt_endereco.getText(), txt_bairro.getText(), txt_cidade.getText(), (String) cmb_uf.getSelectedItem());
+
 		} catch (Exception e) {
 
 			System.out.println(e);
-			
+
 		}
 
 	}
-	
-	/* Classe responsável por conter o código que limpa as informações no formulário*/
+
+	/*
+	 * Classe responsável por conter o código que limpa as informações no formulário
+	 */
 	private void limpar() {
-		
-		/* utilizando o setText para limpar os valores dos campos já preenchidos*/
+
+		/* utilizando o setText para limpar os valores dos campos já preenchidos */
 		txt_cep.setText(null);
 		txt_endereco.setText(null);
 		txt_bairro.setText(null);
@@ -263,5 +271,22 @@ public class Cep extends JFrame {
 		txt_cep.requestFocus();
 		lbl_status.setIcon(null);
 	}
-	
+
+	private void salvarLog(String cep, String endereco, String bairro, String cidade, String uf) {
+		String sql = "INSERT INTO log_busca (cep, endereco, bairro, cidade, uf) VALUES (?, ?, ?, ?, ?)";
+
+		try (Connection conn = dao.getConnection(); PreparedStatement pst = conn.prepareStatement(sql)) {
+			pst.setString(1, cep);
+			pst.setString(2, endereco);
+			pst.setString(3, bairro);
+			pst.setString(4, cidade);
+			pst.setString(5, uf);
+
+			pst.executeUpdate();
+			System.out.println("Log salvo com sucesso!");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 }
