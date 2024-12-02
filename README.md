@@ -30,20 +30,20 @@ Este mini projeto em Java foi desenvolvido para sistemas desktop (Windows) e tem
 3. **Configure a tabela necessária para armazenar logs das buscas realizadas:
   
    ```sql
-  CREATE TABLE logs_busca_cep (
+   CREATE TABLE logs_busca_cep (
       id INT AUTO_INCREMENT PRIMARY KEY,
       endereco VARCHAR(255) NOT NULL,
       cep VARCHAR(10) NOT NULL,
       data_busca TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-  );
+   );
 
 4. **Adicione o driver MySQL Connector/J ao classpath do projeto.
 5. Configure as credenciais de acesso ao banco de dados no código (dao.java):
 
-  String url = "jdbc:mysql://localhost:3306/busca_cep";
-  String username = "seu_usuario";
-  String password = "sua_senha";
-  Connection connection = DriverManager.getConnection(url, username, password);
+   String url = "jdbc:mysql://localhost:3306/busca_cep";
+   String username = "seu_usuario";
+   String password = "sua_senha";
+   Connection connection = DriverManager.getConnection(url, username, password);
 
 ## Contribuições
 Contribuições são bem-vindas!
