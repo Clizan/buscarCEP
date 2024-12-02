@@ -40,6 +40,7 @@ Este mini projeto em Java foi desenvolvido para sistemas desktop (Windows) e tem
 4. **Adicione o driver MySQL Connector/J ao classpath do projeto.
 5. Configure as credenciais de acesso ao banco de dados no código (dao.java):
 
+   ```sql
    String url = "jdbc:mysql://localhost:3306/busca_cep";
    String username = "seu_usuario";
    String password = "sua_senha";
